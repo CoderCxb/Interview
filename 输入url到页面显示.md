@@ -38,7 +38,7 @@ f) DNS还有负载均衡的功能,当一个网站对应多个服务器的时候,
 
 ###### 1.4  HTTP 请求
 
-![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/33426919b394498192132b6249479a3e~tplv-k3u1fbpfcp-zoom-1.image)
+![img](C:\Users\bnqkl\Desktop\Interview\images\4.jpg)
 
 **HTTPS**
 
@@ -52,7 +52,7 @@ HTTP请求一般可分为2类:静态资源和动态资源，静态资源直接�
 
 ###### 1.6 浏览器渲染页面
 
-![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5a2a996acb054128b670bf37e3f51748~tplv-k3u1fbpfcp-zoom-1.image)
+![img](C:\Users\bnqkl\Desktop\Interview\images\5.jpg)
 
 a) 将HTML解析成DOM Tree
 
@@ -60,13 +60,30 @@ b) 将CSS解析成CSSOM Tree
 
 c) 将DOM Tree和 CSSOM Tree构建成渲染树
 
-![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/02120424763f4492a5370919bc3504e8~tplv-k3u1fbpfcp-zoom-1.image)
+![img](C:\Users\bnqkl\Desktop\Interview\images\7.png)
 
 d) 进行重绘和回流
 
-​	i）重绘: 当页面中元素样式发生改变但是不影响它在文档流中的位置时(color,background-color)，浏览器会将新的样式赋予元素并重新绘制。
+​	i)  重绘: 当页面中元素样式发生改变但是不影响它在文档流中的位置时(color,background-color)，浏览器会将新的样式赋予元素并重新绘制。
 
 ​	ii) 回流: 当Render Tree中部分或全部元素的尺寸、结构或者某些属性发生改变时，浏览器重新渲染部分或全部文档的过程。
+
+e) 渲染过程中遇到<script>就会停止渲染,执行JS代码。 因为浏览器的GUI线程和JS引擎线程是互斥的,JS的加载、解析和渲染都会阻塞DOM的构建。一般将DOM放在底部或者给<script>加上defer和async属性。 由于JS可以改变css样式,如果JS想访问css并改变它，则在执行JS前就得拿到完成的CSSOM，因此这种情况下,浏览器会先下载和构建CSSOM，然后再执行JS，最后再构建DOM。
+
+补充: 
+
+1. async和defer的区别:  
+
+![async和defer](C:\Users\bnqkl\Desktop\Interview\images\8.png)
+
+​	a）默认情况下,浏览器会直接加载并执行脚本,不会等DOM加载完毕。
+
+​	b) defer: 加载JS的阶段不会阻塞HTML解析,等到HTML解析完毕后执行JS代码。
+
+​	c) async: 加载JS的截断不会阻塞HTML解析,JS加载完毕立即执行,执行时会阻塞HTML解析。
+
+​	总结：执行时机不同, 并且加载多个JS脚本时,async是无序加载,defer是有序的。
+
 
 
 
@@ -80,7 +97,7 @@ d) 进行重绘和回流
 
 ​	iii) 第三次: 当服务器没有要向浏览器发送的数据时,发送释放连接报文给浏览器。
 
-​    iiii) 第四次: 浏览器收到连接释放报文后,向服务器发出确认。此时TCP连接并不会马上释放，必须经过2MSL(最长报文段寿命)时间后,浏览器才会进入关闭状态。(注意:在第二次挥手后,TCP处在半关闭状态,浏览器无法发送请求,但是可以发送报文)
+ iiii) 第四次: 浏览器收到连接释放报文后,向服务器发出确认。此时TCP连接并不会马上释放，必须经过2MSL(最长报文段寿命)时间后,浏览器才会进入关闭状态。(注意:在第二次挥手后,TCP处在半关闭状态,浏览器无法发送请求,但是可以发送报文)
 
 c) 为什么四次挥手释放连接时,要等待2MSL？
 
