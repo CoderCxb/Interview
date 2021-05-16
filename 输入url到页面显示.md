@@ -38,7 +38,7 @@ f) DNS还有负载均衡的功能,当一个网站对应多个服务器的时候,
 
 ###### 1.4  HTTP 请求
 
-![img](C:\Users\bnqkl\Desktop\Interview\images\4.jpg)
+![img](C:\Users\Administrator.PW6NUH21X31RM79\Desktop\Interview\images\4.jpg)
 
 **HTTPS**
 
@@ -52,15 +52,15 @@ HTTP请求一般可分为2类:静态资源和动态资源，静态资源直接�
 
 ###### 1.6 浏览器渲染页面
 
-![img](C:\Users\bnqkl\Desktop\Interview\images\5.jpg)
+![img](C:\Users\Administrator.PW6NUH21X31RM79\Desktop\Interview\images\5.jpg)
 
 a) 将HTML解析成DOM Tree
 
-b) 将CSS解析成CSSOM Tree 
+b) 将CSS解析成CSSOM Tree（CSS不会影响DOM的解析，但是会阻塞DOM的渲染）
 
 c) 将DOM Tree和 CSSOM Tree构建成渲染树
 
-![img](C:\Users\bnqkl\Desktop\Interview\images\7.png)
+![img](C:\Users\Administrator.PW6NUH21X31RM79\Desktop\Interview\images\7.png)
 
 d) 进行重绘和回流
 
@@ -74,7 +74,7 @@ e) 渲染过程中遇到<script>就会停止渲染,执行JS代码。 因为浏�
 
 1. async和defer的区别:  
 
-![async和defer](C:\Users\bnqkl\Desktop\Interview\images\8.png)
+![async和defer](C:\Users\Administrator.PW6NUH21X31RM79\Desktop\Interview\images\8.png)
 
 ​	a）默认情况下,浏览器会直接加载并执行脚本,不会等DOM加载完毕。
 
