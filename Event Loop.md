@@ -35,7 +35,7 @@
 
 ### 4. 事件循环
 
-![img](C:\Users\bnqkl\Desktop\Interview\images\9.png)
+![img](image/9.png)
 
 - 微任务(Microtask): script标签、setTimeout、setInterval、I/O、UI  Rendering。
 - 宏任务(Macrotask): Promise、MutationObserver、process.nextTick(Node)。
@@ -45,7 +45,7 @@
 
 
 
-<img src="C:\Users\bnqkl\Desktop\Interview\images\10.png" alt="img" style="zoom: 50%;" />
+![](images\10.png)
 
 流程文字版: 
 
