@@ -115,5 +115,11 @@ ReactDOM.createPortal(
 // 可以将portal设置为一个变量，然后在componentDidMount生命周期中进行赋值，然后在render函数中进行渲染。
 ```
 
+##### 4. context
 
+
+
+
+
+##### 5. 异步组件
 
