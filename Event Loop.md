@@ -37,8 +37,8 @@
 
 ![img](image/9.png)
 
-- 微任务(Microtask): script标签、setTimeout、setInterval、I/O、UI  Rendering。
-- 宏任务(Macrotask): Promise、MutationObserver、process.nextTick(Node)。
+- 宏任务(Macrotask): script标签、setTimeout、setInterval、I/O、UI  Rendering。
+- 微任务(Microtask): Promise、MutationObserver、process.nextTick(Node)。
 - 执行栈(Call Stack):  当任务执行完毕时，就会将其移除。
 
 注意：setTimeout和setInterval并不是定时之后马上执行，它们的含义是定时之后，将回调加入到宏任务队列。
