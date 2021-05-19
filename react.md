@@ -87,5 +87,33 @@
   // 2. 在方法中，setState是异步的，后续的setState获取的state都是旧的，所以只会以最后一次的setState为准。
   ```
 
-  
+
+
+
+##### 2.  生命周期
+
+![img](images/12.png)
+
+
+
+##### 3. Portals 传送门
+
+```react
+// 1. 基本使用 将元素传送到指定的DOM元素下 类似vue的teleport
+ReactDOM.createPortal(
+    <button>按钮</button>,
+    document.getElementById('box'))
+
+// 2. 注意点
+// 2.1 指定的DOM元素必须已经挂载了,不然获取不到,在render函数中拿不到DOM元素(除了body和document)，所以挂载到别的DOM得用别的方式使用。
+// 2.2 注意portal的事件冒泡，portal的事件冒泡并不会传递给传送后的父级DOM元素，而是按照代码中的父级进行冒泡。
+
+// 3. 使用方式
+// 3.1 方式一
+// 通过自己创建一个DOM元素，然后将创建的portal挂载到该DOM上，然后再将这个DOM元素挂载到指定的DOM元素上。
+// 3.2 方式二
+// 可以将portal设置为一个变量，然后在componentDidMount生命周期中进行赋值，然后在render函数中进行渲染。
+```
+
+
 
