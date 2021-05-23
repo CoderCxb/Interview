@@ -6,7 +6,7 @@
   // 情况一
   this.state.count++; 	// 不允许
   // 情况二 
-  // 虽然看起来没什么问题，但是push的时候list已经发生改变了
+  // 虽然看起来没什么问题，但是push的时候list已经发生改变了并且由于在setState时，list已经发生改变，所以setState前后的list是相等的，这样的话shouldComponentUpdate就无法进行优化。
   this.setState({
       list:this.state.list.push(1) // 不允许
   })
@@ -117,9 +117,92 @@ ReactDOM.createPortal(
 
 ##### 4. context
 
+```react
+// 1. 创建一个需要共享的context
+const MyContext = createContext({
+    theme:'dark'
+})
+
+// 2. 使用 value发生改变时，其中所有消费(Consumer)组件都会重新渲染
+<MyContext.Provider value={{theme:'light'}}>
+    {/* Context的用法一 */}
+    <MyContext.Consumer>
+        {/* 通过props传入,通过this.props访问*/}
+        {(value) => <UseContext {...value}></UseContext>}
+    </MyContext.Consumer>
+</MyContext.Provider>
+
+// 类组件
+// static contextType=MyContext;
+// 通过this.context访问
+```
+
+
+
 
 
 
 
 ##### 5. 异步组件
+
+```react
+// 1. import ();
+// 2. React.lazy(import());
+// 3. Suspense
+```
+
+##### 6. 性能优化
+
+```react
+// 前情提要:
+// 在react中，父组件更新时，所有子组件都会触发更新 因为shoulad
+// 1. shouldComponentUpdate
+
+// 2. PureComponent
+class MyComponent extends React.PureComponent{}
+// 3. memo
+function MyComponent(props) {
+  /* 使用 props 渲染 */
+}
+function areEqual(prevProps, nextProps) {
+  /*
+  如果把 nextProps 传入 render 方法的返回结果与
+  将 prevProps 传入 render 方法的返回结果一致则返回 true，
+  否则返回 false
+  */
+}
+// 当不传入areEqual函数时，默认进行浅层比较，即只比较props第一层属性
+export default React.memo(MyComponent, areEqual);
+```
+
+
+
+##### 7. 公共代码抽离
+
+本质上都是将需要包装的组件传递到一个函数中
+
+- #####  High Order Component (HOC) 高阶组件
+
+```react
+const hoc= (Component)=>{
+    class updateComponent extends React.Component{
+        constructor(props){}
+        render(){
+			// 可以传递props
+            return <div>
+            	<Component></Component>
+            </div>
+        }
+    }
+    return updateComponent;
+}
+// 使用
+hoc()
+```
+
+- ##### Render Props
+
+```react
+
+```
 
