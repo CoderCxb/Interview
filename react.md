@@ -137,12 +137,6 @@ const MyContext = createContext({
 // 通过this.context访问
 ```
 
-
-
-
-
-
-
 ##### 5. 异步组件
 
 ```react
@@ -203,6 +197,18 @@ hoc()
 - ##### Render Props
 
 ```react
-
+function Test(props){
+  let {render}=props;
+  let title='Render Props';
+  return <div>
+    {render(title)}
+  </div>
+}
+// 通过传递函数组件(名字任意,此处叫render),然后子组件通过props获取到这个函数组件并传参使用。(此处的感觉有点像插槽,并且和普通复用组件逻辑相似)
+export default function RenderProps(){
+  return <div>
+    <Test render={(value)=><h1>{value}</h1>}></Test>
+  </div>
+}
 ```
 
