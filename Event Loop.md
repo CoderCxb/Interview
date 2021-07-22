@@ -35,10 +35,10 @@
 
 ### 4. 事件循环
 
-![img](image/9.png)
+![img](images\9.png)
 
-- 宏任务(Macrotask): script标签、setTimeout、setInterval、I/O、UI  Rendering。
-- 微任务(Microtask): Promise、MutationObserver、process.nextTick(Node)。
+- 宏任务(Macrotask): script标签、setTimeout、setInterval、I/O、UI 交互事件。
+- 微任务(Microtask): Promise、queueMicrotask、MutationObserver、process.nextTick(Node)。
 - 执行栈(Call Stack):  当任务执行完毕时，就会将其移除。
 
 注意：setTimeout和setInterval并不是定时之后马上执行，它们的含义是定时之后，将回调加入到宏任务队列。
@@ -49,8 +49,7 @@
 
 流程文字版: 
 
-- 程序执行，碰到script标签为宏任务，将其添加到 Task Queque(宏任务队列), 此时没有同步代码并且微任务为空，将script推入Call Stack(执行栈)。
-- 执行script标签中的代码，同步代码直接进入主线程执行，而微任务和宏任务则等待异步的结果，待获取到异步结果后将**回调**加入各自的任务队列。
+- 程序执行，碰到script标签，执行script标签中的代码，同步代码直接进入主线程执行，而微任务和宏任务则等待异步的结果，待获取到异步结果后将**回调**加入各自的任务队列。
 - 主线程同步代码执行完毕，首先检查微任务队列，若微任务队列中有任务，则依次推入执行栈。（同步代码直接执行，异步代码同上，执行完就出栈）
 - 待微任务队列为空时，开始将宏任务推入执行栈。（每次执行宏任务前，都会先检查微任务队列，只有微任务队列为空才会执行宏任务）
 
@@ -60,3 +59,8 @@
 
 - js是单线程的，为了防止I/O等异步的操作阻塞主线程，提出了一套事件循环机制，通过将异步的操作挂起，继续执行后续代码，等到异步结果出来，在执行其回调函数，从而保证主线程的通畅。
 
+
+
+为什么要区分微任务和宏任务
+
+​	加入微任务可以更好的控制代码执行的流程，如果只有宏任务，那么如果想让代码在同步代码后、宏任务之前执行就尤为困难。
