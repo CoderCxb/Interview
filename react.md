@@ -111,7 +111,7 @@
 
 // 5. componentDidMount() 组件挂载完毕时触发
 // 和浏览器的交互需要在这个生命周期中定义，因为这是组件才挂载完毕，其他生命周期时，组件还没有挂载，也就无法操作DOM。
-// 网络请求也可以放在这里请求。
+// 官方推荐网络请求放在这个生命周期
 
 // 二、组件更新阶段
 // 1. static getDerivedStateFromProps(props, state) 同挂载阶段。
@@ -274,7 +274,6 @@ export default function RenderProps(){
 ```
 
 #####  8. Hooks
-
 ```react
 // 1. useState
 // useState返回一个数组 [0]是值 [1]是设置值的函数
@@ -365,6 +364,9 @@ export default function RenderProps(){
 
 
 ##### 10. 受控组件和非受控组件
+受控组件:
+
+非受控组件: 
 
 ```javascript
 
@@ -401,13 +403,6 @@ export default function RenderProps(){
 
 ##### 16. React的事件机制
 
+###### 17. JSX
 
-
-
-
-
-
-
-
-
-
+###### 18. 

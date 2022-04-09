@@ -1,7 +1,6 @@
 #### 1. Webpack常见loader
-
-- html-loader :  将 HTML 导出为字符串。当编译器需要时，将压缩 HTML 字符串。
-- css 相关 loader
+  - html-loader :  将 HTML 导出为字符串。当编译器需要时，将压缩 HTML 字符串。
+  - css 相关 loader
   - style-loader ：将 import style from './style.css' 以`<style></style>`插入到 DOM 中
   - css-loader：对 `@import` 和 `url()` 进行处理
   - less-loader:  加载 Less并编译为 CSS 
@@ -24,7 +23,7 @@
 - terser-webpack-plugin : 对JS代码进行压缩混淆
 - webpack-parallel-uglify-plugin：多线程执行代码压缩混淆，提高构建性能
 - webpack-bundle-analyzer ：可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
-- define-plugin: 用于在编译阶段定义全局变量
+- define-plugin: 用于在编译阶段定义全局常量
 
 #### 3. Loader 和 Plugin 的区别
 
@@ -93,3 +92,12 @@
   
 - 模块热更新: 运行时在本地服务器 dev-server 上在挂载一个websocket，本地服务器和浏览器之间通过websocket进行通信，当代码发生改变时，dev-server向浏览器发送一个包含hash的websocket消息，浏览器接收到后通过网络请求获取改变后的代码。
 
+
+
+#### 6. 什么是SourceMap? 作用是什么？
+
+
+#### 7. 什么是tree-shaking? 
+
+
+#### 8. 
