@@ -1,7 +1,6 @@
 ##### 0. JSX
 Javascript XML - JS的语法扩展, 能够清晰准确的描述UI结构,并且在插入数据时会进行转译, 避免注入攻击(XSS),本质上调用了React.createElement()方法
 
-
 ##### 1. context
 避免显示跨层级的props传递, 常用与如主题、地区的设置
 ```tsx
@@ -151,6 +150,7 @@ function App(){
 // 注意点：
 // 1. 外部添加了一层外壳, 所以无法直接通过ref获取到原组件的实例, 需要借助 forwardRef
 // 2. 返回新的组件, 丢失原本类组件的静态属性
+// 3. 命名可能会冲突
 
 
 ```
@@ -228,6 +228,18 @@ ReactDOM.createPortal(
 
 
 ##### 7. setState
+- 不可变性
+通过setState修改state, 因此经常需要对state上的对象进行拷贝, 常用的有扩展运算符(...)和Object.assign()以及 immer.js
+```tsx
+
+this.setState({
+  user: {
+    ...this.state.user,
+    title: 'React', // 修改
+  }
+});
+
+```
 
 - 不得直接修改state，需要使用setState修改state
 ```javascript
@@ -332,7 +344,6 @@ requestAnimationFrame(()=>{
 // 在渲染函数中不得使用setState，因为setState会不断触发render，会导致页面不断的更新，无法正常显示。
 // 返回值:JSX、数组、fragments、Protals、字符串和数值、布尔和nul
 
-// 4. UNSAFE_componentWillMount() 16版本会报警告,17版本报异常 不建议使用
 
 // 5. componentDidMount() 组件挂载完毕时触发
 // 和浏览器的交互需要在这个生命周期中定义，因为这是组件才挂载完毕，其他生命周期时，组件还没有挂载，也就无法操作DOM。
@@ -346,7 +357,7 @@ requestAnimationFrame(()=>{
 // 通过对比props和state前后变化，决定返回true还是false来优化性能。
 // 可以使用forceUpdate强制更新组件，但是子组件的更新照常。
 
-// 3. UNSAFE_componentWillUpdate(nextProps, nextState) 16版本会报警告,17版本报异常 不建议使用
+
 
 // 4. render()
 
@@ -373,7 +384,16 @@ requestAnimationFrame(()=>{
 // 可执行副作用，记录错误情况。
 // 开发模式：错误会冒泡至window，即错误会被根错误处理机制捕获。
 // 生产模式：只会没有被处理的错，才会被根错误处理机制捕获。
+
+
+// 废弃的生命周期
+// 1. UNSAFE_componentWillMount() 16版本会报警告,17版本报异常 不建议使用
+// 2. UNSAFE_componentWillUpdate(nextProps, nextState) 16版本会报警告,17版本报异常 不建议使用
+// 3. UNSAFE_componentWillReceiveProps() 16版本会报警告,17版本报异常 不建议使用
+// 原因: 这些生命周期处于render之前, 在Fiber架构下, 任务是可以被打断的, 可能会导致多次执行
 ```
+
+
 
 ##### 5. 异步组件
 ```jsx
@@ -385,6 +405,10 @@ requestAnimationFrame(()=>{
 #####  8. Hooks
 hooks使函数组件具有的自己的状态和生命周期, 相比于类组件, hooks更加灵活, 类组件中无法通过功能将代码进行拆分,如生命周期函数中往往包含了很多不同的功能逻辑, 而hooks可以将代码进行拆分,每个部分都可以具备自己的state和生命周期
 
+###### 优势
+ - 无需关注this
+ - 可以功能逻辑分离,即每个功能都能够拥有自己的state和生命周期
+
 ###### 使用规则
  - 不要在循环，条件或嵌套函数中调用 Hook， 确保总是在你的 React 函数的最顶层以及任何 return 之前调用他们,这样可以保证Hook的顺序
  - 只在 React 函数中调用 Hook
@@ -395,7 +419,7 @@ hooks使函数组件具有的自己的状态和生命周期, 相比于类组件,
 // const [count,setCount]=useState(0);
 
 // 2. useEffect
-// 监听state改变,在DOM更新完毕后异步执行，不会阻塞DOM
+// 监听state改变,在DOM更新完毕后,组件重新渲染后执行,不会阻塞DOM
 // 第一个参数回调,第二个参数是依赖(依赖改变,触发回调)
 // 可以返回函数, 该函数在清除effect时执行,并且每次执行effect都会清除上一个effect
 // 2.1 模拟componentDidUpdate 不接收依赖
@@ -403,7 +427,7 @@ hooks使函数组件具有的自己的状态和生命周期, 相比于类组件,
 // 2.3 接收依赖为[],并且回调函数返回一个函数,该函数在组件卸载时触发
 
 // 3. useLayoutEffect
-// 和 useEffect相同,但是在DOM更新完毕后是同步执行，会阻塞DOM
+// 在DOM更新完毕后,组件重新渲染前执行，会阻塞DOM
 // 相当于生命周期 componentDidMount 和 componentDidUpdate 
 
 // 4. useContext  共享上下文
@@ -463,6 +487,9 @@ hooks使函数组件具有的自己的状态和生命周期, 相比于类组件,
 
 
 
+###### 原理
+ - hook的实现是通过单向链表实现的,必须确保hooks的顺序,这也是为什么hooks必须在顶层而不能在循环、条件中使用的原因
+
 
 ##### 10. 受控组件和非受控组件
 受控组件: 组件状态受state和方法控制
@@ -493,7 +520,6 @@ function Com(){
 - 事件总线
 - redux 、 mobx 第三方库
 
-##### 15.  Redux相关概念
 
 ##### 16. React的合成事件
 React合成事件是原生事件的跨浏览器包装器
@@ -539,6 +565,10 @@ React合成事件是原生事件的跨浏览器包装器
 
 ###### 18. diff算法和key的作用
 
+##### 15.  Redux相关概念
+
+##### React流程
+React
 
 ##### API
 

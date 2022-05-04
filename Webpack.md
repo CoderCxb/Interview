@@ -20,71 +20,69 @@
 
 - html-webpack-plugin: 简化html创建过程,自动创建文件并将打包后的js导入html文件
 - mini-css-extract-plugin：提取chunk的css代码到独立文件
+- CssMinimizerWebpackPlugin: 将css打包成单独的文件
 - terser-webpack-plugin : 对JS代码进行压缩混淆
 - webpack-parallel-uglify-plugin：多线程执行代码压缩混淆，提高构建性能
 - webpack-bundle-analyzer ：可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
 - define-plugin: 用于在编译阶段定义全局常量
 
 #### 3. Loader 和 Plugin 的区别
-
 - 首先,Webpack只认识Javascript文件和 Json文件，因此需要对别的类型的文件进行操作的时候，就需要使用loader，loader本质上是一个函数，将接收到的内容进行转换后返回给下一个loader。
 - Plugin就是插件，基于Tapable事件流框架，用于扩展Webpack的功能，Webpack的生命周期中会广播很多事件，Plugin可以监听这些事件并在合适的时机通过Webpack提供的API改变输出的结果。
 
-
-
 #### 4. 如何优化构建体验
+- loader层面
+  - loader使用缓存,如babel-loader可以直接添加?cacheDirectory开启,如果loader不支持,可以使用cache-loader进行缓存
+  - 使用`HappyPack`开启多进程打包
+    ```javascript
+    // @file: webpack.config.js
+    const HappyPack = require('happypack');
+    module.exports={
+        module:{
+            rules:[
+                {
+                  test: /.js$/,
+                  use: 'happypack/loader',
+                }
+            ]
+        },
+        plugins:[
+          new HappyPack({
+            loaders: [ 'babel-loader?cacheDirectory' ]
+          })
+        ]
+    }
+    ```
+- JS文件层面
+  - `ParallelUglifyPlugin`开启多进程压缩混淆代码,亦或是直接使用`TerserWebpackPlugin`中包含配置选项可以开启多线程
 
-- loader使用缓存,如babel-loader可以直接添加?cacheDirectory开启,如果loader不支持,可以使用cache-loader进行缓存
+- 修改频率低的第三方库
+  - 使用 `DllPlugin` 和`DllReferencePlugin` 将更改不频繁的代码进行单独编译(第三方的库，如react、lodash、axios)
+  - 除了DLL的方式, 还可以通过配置external以及CDN的方式来使用更改不频繁的资源(可以通过HtmlWebpackPlugin配置)
 
-- 使用`HappyPack`开启多进程打包
+- 模块
+  - hard-source-webpack-plugin用于缓存模块
 
-  ```javascript
-  // @file: webpack.config.js
-  const HappyPack = require('happypack');
-  module.exports={
-      module:{
-          rules:[
-              {
-                test: /.js$/,
-                use: 'happypack/loader',
-              }
-          ]
-      },
-      plugins:[
-        new HappyPack({
-          loaders: [ 'babel-loader?cacheDirectory' ]
-        })
-      ]
-  }
-  ```
-
-- `ParallelUglifyPlugin`开启多进程压缩混淆代码,亦或是直接使用`TerserWebpackPlugin`中包含配置选项可以开启多线程
-
-- 使用```HotModuleReplacementPlugin```插件开启模块热更新
-
-- 按需加载代码
+- 体积层面
+  - 使用插件对构建的结果进行分析
 
 - 优化 `SourceMap`模式
 
-- 使用 `DllPlugin` 和`DllReferencePlugin` 将更改不频繁的代码进行单独编译(第三方的库，如react、lodash、axios)
-
-- hard-source-webpack-plugin用于缓存模块
-
-- 使用插件对构建的结果进行分析
 
 
-#### 5. 优化性能
+#### 5. 优化体积
+ - TerserWebpackPlugin压缩JS/CssMinimizerWebpackPlugin压缩CSS
+ - gzip压缩
+ - webpack-bundle-analyzer
+ - 配置库的按需加载,如ant-design这种组件库都支持
 
+
+#### 6. 优化性能
 - 小图片使用base64编码
 - bundle使用hash,为了更好的缓存
 - 懒加载
 - 提取公共代码
 - IgnorePlugin，忽略第三方包指定目录，让这些指定目录不要被打包进去
-
-
-
-
-
 - hash
   - Hash:和整个项目构建相关，只要项目文件发生改变，整个项目的hash都改变。
   - ChunkHash: 和Webpack打包的Chunk有关，不同的入口出来不同的Chunk。
@@ -95,9 +93,36 @@
 
 
 #### 6. 什么是SourceMap? 作用是什么？
+在开发时, webpack会将代码进行打包, 此时如果报错,报错的位置默认情况下并不是源代码的位置,为了方便调试,引入了source-map,可以理解为源代码的映射
 
+模式规则:  \[ inline- | hidden- | eval- ]\[ nosources- ]\[ cheap- \[ module- ] ]source-map 
+ - eval-*: 使用eval执行模块,优化了重新构建时的性能
+ - inline-*: 将 SourceMap 内联到原始文件，而不是创建单独的文件
+ - hidden-*: 不添加对SourceMap的引用,即SourceMap文件会生成,但是不生效,因为没有引用
+ - nosources-*: SourceMap中不包含源代码,也就无法映射到源代码的位置了
+
+ - *-module-*: 默认情况下忽略Loader SourceMap,即只能映射到loader编译之后的代码,而不会源代码,使用 *-module-*的模式,能够对Loader SourceMap进行映射,获取更好的映射效果。
+ - *-cheap-*: 不映射列数,仅映射行数
+
+例子: eval-nosources-cheap-module-source-map: 使用eval执行模块,不包含源代码,忽略列数,映射loader的模式
 
 #### 7. 什么是tree-shaking? 
+tree-shaking是描述移除未引用代码的概念, 依赖ES6的静态模块特性。
+
+#### 8. TerserWebpackPlugin压缩JS代码
+ - 删除空格
+ - 缩写变量
+ - 删除注释
+ - 预计算,将一些依赖常量的表达式提前计算,直接使用其结果
+ 
+
+#### 工程化配置
+ - prittier
+ - eslint 
+ - githooks
+  - .git/hooks
+ - commitlint
+ - CI/CD
 
 
-#### 8. 
+#### 10. rollup、vite和webpack对比
