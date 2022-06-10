@@ -36,7 +36,7 @@
 
 ![img](images\9.png)
 
-- 宏任务(Macrotask): script标签、setTimeout、setInterval、I/O、UI 交互事件。
+- 宏任务(Macrotask): script标签、setTimeout、setInterval、MessageChannel、I/O、UI 交互事件。
 - 微任务(Microtask): Promise、queueMicrotask、MutationObserver、process.nextTick(Node)。
 - 执行栈(Call Stack):  当任务执行完毕时，就会将其移除。
 

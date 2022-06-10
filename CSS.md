@@ -1,7 +1,7 @@
 # CSS
 
 #### CSS3新特性
-过度、动画、形变、弹性布局(flex)、网格布局(grid)、word-wrap、渐变、媒体查询、盒模型
+过渡、动画、形变、弹性布局(flex)、网格布局(grid)、word-wrap、渐变、媒体查询、盒模型
 
 #### link
  - preload: 并行预加载优先级较高的资源,可能是路由接下去要使用的资源
@@ -9,14 +9,14 @@
 
 #### 盒模型
 标准盒模型和IE盒模型的区别是: 设置的宽高是否包含padding和border
-标准盒模型不包含:盒子的实际尺寸 = 内容(设置的宽/高) + 内边距 + 边框
-IE 盒模型包含:盒子的实际尺寸 = 设置的宽/高 = 内容 + 内边距 + 边框
+标准盒模型不包含:盒子的实际尺寸 = 设置的宽/高 + 内边距 + 边框  
+IE 盒模型包含:盒子的实际尺寸 = 内容(设置的宽/高) + 内边距 + 边框
 
 CSS3添加的属性box-sizing 
-border-box: 标准盒模型
-content-box: IE盒模型
+content-box: 标准盒模型
+border-box: IE盒模型
 
-#### BFC·
+#### BFC
 块格式化上下文(Block Formatting Context,BFC): 为CSS概念,可以理解为一个独立容器,决定了其中元素的排版逻辑。
 
 PS: 还有IFC,IFC内部元素是水平排版
@@ -137,8 +137,8 @@ flex可以看成是一维的,而Grid是二维的
 
 ###### 需要掌握
  - 如何居中: 和flex布局一样, 水平 just-content:center; 垂直: align-items: center
- - 左侧固定、右侧自适应: 使用 grid-template-row: 300px 1fr;
- - 分为3列: grid-template-row: 1fr 1fr 1fr;
+ - 左侧固定、右侧自适应: 使用 grid-template-columns: 300px 1fr;
+ - 分为3列: grid-template-columns: 1fr 1fr 1fr;
 
 
 #### 定位 - position
@@ -353,11 +353,17 @@ CSS选择器: id选择器(#id)、类选择器(.class)、标签选择器(div)、�
 
 #### 常见面试题
 
-##### 设置长宽比
+##### 设置宽高比
 ```css
+/* IE9之后兼容 */
 div{
   width: 100px;
   aspect-ratio: 2; /* 值是 宽/高 */
+}
+/* 当padding设置为百分比时, 是相对于容器(父元素)的宽度 */
+div{
+  width: 100%;
+  padding: 50% 0;
 }
 ```
 
@@ -382,3 +388,11 @@ document.body.oncopy = function(){
 PostCSS 接收一个 CSS 文件并提供了一个 API 来分析、修改它的规则（通过把 CSS 规则转换成一个抽象语法树的方式）。在这之后，这个 API 便可被许多插件利用来做有用的事情，比如寻错或自动添加 CSS vendor 前缀。
  - autoprefixer 自动增加前缀
  - 单位转换 px -> vh
+
+
+###### BEM规范
+ - B(Block)、E(Element)、M(modifier)
+ - 形式
+  - \- 中划线:      仅作为连字符使用，表示某个块或者某个子元素的多单词之间的连接记号
+  - __ 双下划线: 双下划线用来连接块和块的子元素
+  - _ 单下划线:  单下划线用来描述一个块或者块的子元素的一种状态

@@ -1,5 +1,12 @@
 ##### 0. JSX
-Javascript XML - JS的语法扩展, 能够清晰准确的描述UI结构,并且在插入数据时会进行转译, 避免注入攻击(XSS),本质上调用了React.createElement()方法
+Javascript XML - JS的语法扩展, 能够清晰准确的描述UI结构,并且在插入数据时会进行转译, 避免注入攻击(XSS),本质上调用了React.createElement(component, props, ...children)方法
+
+jsx -> 经过@babel/preset-react变成JS对象 -> 传入React.createElement() -> ReactElement -> ReactDOM.render -> Fiber(stateNode属性就是对应的真实DOM)
+
+##### 核心包
+ - react: 包含react所必须的核心代码
+ - react-dom: 将react渲染到不同平台(此处为渲染成真实DOM)所需要的核心代码
+ - babel: 将jsx转换成JS对象并调用React.createElement()
 
 ##### 1. context
 避免显示跨层级的props传递, 常用与如主题、地区的设置
@@ -22,7 +29,7 @@ export const ThemeContext = React.createContext({
 });
 
 // themed-button.js
-import {ThemeContext} from './theme-context';
+import { ThemeContext } from './theme-context';
 
 class ThemedButton extends React.Component {
   static contextType = ThemeContext;
@@ -66,8 +73,12 @@ class App extends React.Component {
 
   render() {
     // 整个 state 都被传递进 provider
+    // 也可以使用Context.Consumer的形式
     return (
       <ThemeContext.Provider value={this.state}>
+        <ThemeContext.Consumer>
+          {value=>{}}
+        </ThemeContext.Consumer>
         <Content />
       </ThemeContext.Provider>
     );
@@ -87,7 +98,7 @@ ReactDOM.render(<App />, document.root);
 
 
 ##### 2. Refs转发
-可以获取组件内部的某个组件实例
+可以获取组件内部的某个组件实例(函数组件没有实例,无法使用ref)
 ```tsx
 // 不使用转发, 无法获取FancyButton中的button组件的实例
 const FancyButton = React.forwardRef((props, ref) => (
@@ -120,10 +131,11 @@ const ref = React.createRef();
 
 ##### 4. 逻辑复用 
 ###### High Order Component (HOC) 高阶组件
-接收一个组件返回一个新的组件的函数, 在HOC中可以对组件进行扩展(如传递props、扩展生命周期),封装通用逻辑,使这部分通用逻辑能够被复用, 如 Redux的Connect 
+接收一个组件返回一个新的组件的函数, 在HOC中可以对组件进行扩展(如传递props、扩展生命周期),封装通用逻辑,使这部分通用逻辑能够被复用, 如 Redux的Connect
 ```jsx
 // 正向属性代理
 const hoc= (Component)=>{
+  // 也可以返回函数组件
 	class updateComponent extends React.Component{
 		render(){
 			return <div>
@@ -175,7 +187,7 @@ export default function RenderProps(){
 
 ##### 5. 性能优化
 
-###### 根据props和state是否发生改变来控制组件是否更新
+###### 根据props是否发生改变来控制组件是否更新
 ```jsx
 // 前情提要:
 // 在react中，父组件更新时，所有子组件都会触发更新
@@ -205,6 +217,16 @@ export default React.memo(MyComponent, areEqual);
 ```
 
 ###### 当函数作为props传递时, 需要注意这个函数不能根据组件渲染而重新创建, 否则会导致使用该函数的子组件更新(哪怕使用了PureComponent或者memo,因此函数重新创建了)
+
+###### 父组件更新导致子组件重复渲染
+```jsx
+// <Son />这个写法会导致React.createElement(Son)重新创建, 所以每次打props都不一样,所以更新
+<Parent>
+  <Son />
+</Parent>
+
+```
+
 
 
 ##### 6. Portals
@@ -247,21 +269,17 @@ this.setState({
 this.state.count++; 	// 不允许, 不具备相应式
 
 // 情况二 
-// 虽然看起来没什么问题，但是push的时候list已经发生改变了并且由于在setState时，list已经发生改变，所以setState前后的list是相等的，这样的话shouldComponentUpdate就无法进行优化
+// 虽然看起来没什么问题，但是push的时候list已经发生改变了并且由于在setState时，list已经发生改变，所以setState前后的list是相等的，这样的话使用PureComponent和React.memo会导致组件不更新
+this.state.list.push(+new Date())
 this.setState({
-		list:this.state.list.push(1) // 不允许
-})
-// 等价于
-this.state.push(1);
-this.setState({
-		list:this.state.list
+		list:this.state.list // 不允许
 })
 ```
 
 - 同步 | 异步
 ```javascript
 // count 默认设置为 0 
-// 1. 在合成事件中(如 onClick) setState是异步的
+// 1. 在合成事件中(如 onClick) setState是异步的, 也就是进行了批处理
 this.setState({
 		count:this.state.count+1
 },()=>{
@@ -291,7 +309,7 @@ this.setState((preState)=>{
 })
 console.log(this.state.count) // 0，同步获取不到最新值,但是页面上显示的是最新值(2);
 
-// 大胆的推断，setState在宏任务中是同步的
+// 大胆的推断，setState在异步任务中是同步的
 // 4. setTimeout中 setState是同步的
 setTimeout(()=>{
 		this.setState({
@@ -315,21 +333,22 @@ requestAnimationFrame(()=>{
 	})
 	console.log(this.state.count); // 1
 })
+
+// Promise中也是同步的
 ```
 
 - 多次执行setState时，是否会被合并
 ```javascript
 // 与setState的同步与异步有关
-// 1. 在setTimeout和自定义DOM中，setState是同步的，因此后续的setState获取的值就是最新的，每次操作都是有效的。
+// 1. 在setTimeout和自定义DOM中以及微任务中，setState是同步的，因此后续的setState获取的值就是最新的，每次操作都是有效的。
 // 2. 在方法中，setState是异步的，后续的setState获取的state都是旧的，所以只会以最后一次的setState为准。
 ```
 
 
 
+##### 8. 生命周期
 
-##### 2. 生命周期
-
-![img](images/12.png)
+![img](../images/12.png)
 
 ```jsx
 // 一、组件挂载阶段
@@ -395,14 +414,14 @@ requestAnimationFrame(()=>{
 
 
 
-##### 5. 异步组件
+##### 9. 异步组件
 ```jsx
 // 1. import ();
 // 2. React.lazy(import());
 // 3. Suspense
 ```
 
-#####  8. Hooks
+##### 10. Hooks
 hooks使函数组件具有的自己的状态和生命周期, 相比于类组件, hooks更加灵活, 类组件中无法通过功能将代码进行拆分,如生命周期函数中往往包含了很多不同的功能逻辑, 而hooks可以将代码进行拆分,每个部分都可以具备自己的state和生命周期
 
 ###### 优势
@@ -416,18 +435,21 @@ hooks使函数组件具有的自己的状态和生命周期, 相比于类组件,
 ```jsx
 // 1. useState
 // useState返回一个数组 [0]是值 [1]是设置值的函数
-// const [count,setCount]=useState(0);
+const [count,setCount]=useState(0);
+// setCount无论在哪执行,都会进行批处理,表现形式类似异步, 无法直接获取修改后的count
+// 这也是跟setState不太相同的点
 
 // 2. useEffect
-// 监听state改变,在DOM更新完毕后,组件重新渲染后执行,不会阻塞DOM
+// 监听state改变,在DOM更新完毕后,组件重新渲染后执行(浏览器完成布局和绘制后),不会阻塞页面布局/绘制
 // 第一个参数回调,第二个参数是依赖(依赖改变,触发回调)
+// 在useEffect中修改state,会导致浏览器重新布局/绘制, 可能导致闪烁
 // 可以返回函数, 该函数在清除effect时执行,并且每次执行effect都会清除上一个effect
 // 2.1 模拟componentDidUpdate 不接收依赖
 // 2.2 模拟componentDidMount 接收依赖为[]
 // 2.3 接收依赖为[],并且回调函数返回一个函数,该函数在组件卸载时触发
 
 // 3. useLayoutEffect
-// 在DOM更新完毕后,组件重新渲染前执行，会阻塞DOM
+// 在DOM更新完毕后,组件重新渲染前执行(浏览器完成布局和绘制前)，会阻塞页面布局/绘制
 // 相当于生命周期 componentDidMount 和 componentDidUpdate 
 
 // 4. useContext  共享上下文
@@ -435,7 +457,7 @@ hooks使函数组件具有的自己的状态和生命周期, 相比于类组件,
 // const MyContext = createContext({
 //    theme:'dark'
 // })
-// 然后通过 const context=useContext(MyContext);获取
+// 然后通过 const context = useContext(MyContext);获取
 
 // 5. useMemo  类似于计算属性 
 // 接收回调函数和依赖 依赖发生改变时重新计算值(有缓存)
@@ -475,23 +497,34 @@ hooks使函数组件具有的自己的状态和生命周期, 相比于类组件,
 // 7. useCallback 返回缓存过的回调函数 这个函数只有在依赖发生改变时才会重新创建
 // 因为默认情况下,函数组件重新渲染的时候 其中的函数都会重新创建
 // 可以传递一个空的数组,该函数就会被缓存 而非重新创建
+// 注意: useCallback中的依赖的值就是上一次创建的时候的值, 所以依赖发生改变时,需要重新创建,避免使用了旧的值
 // 应用场景/解决的问题: 父组件是一个函数组件时,其中定义的方法在每次重新渲染的时候都会重新创建方法，尤其是当这个方法会传递给子组件的时候,会导致子组件的更新
 // const memoizedCallback=useCallback(()=>{
 // 		doSomething(count)
 // },[count])
-	
-// 8. useDebugValue(value)
+
+// 8. useImperativeHandle
+// 与forwardRef一起使用, 控制暴露给父组件的实例(不暴露整个ref)
+function FancyInput(props, ref) {
+  const inputRef = useRef();
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current.focus();
+    }
+  }));
+  return <input ref={inputRef} {...props} />;
+}
+FancyInput = forwardRef(FancyInput);
+
+// 9. useDebugValue(value)
 // useDebugValue用于在React开发者工具中显示自定义hook
 ```
 
-
-
-
 ###### 原理
- - hook的实现是通过单向链表实现的,必须确保hooks的顺序,这也是为什么hooks必须在顶层而不能在循环、条件中使用的原因
+ - hook的实现是通过环形单向链表实现的,必须确保hooks的顺序,这也是为什么hooks必须在顶层而不能在循环、条件中使用的原因
 
 
-##### 10. 受控组件和非受控组件
+##### 11. 受控组件和非受控组件
 受控组件: 组件状态受state和方法控制
 ```tsx
 function Com(){
@@ -510,18 +543,14 @@ function Com(){
 <input type="file" ref={this.file} />
 ```
 
-
-
-##### 11. 什么是React Fiber
-
-##### 14. React组件通信方式
+##### 12. React组件通信方式
 - props以及传递回调函数
 - context
 - 事件总线
 - redux 、 mobx 第三方库
 
 
-##### 16. React的合成事件
+##### 15. React的合成事件
 React合成事件是原生事件的跨浏览器包装器
 
 ###### 事件绑定
@@ -531,7 +560,8 @@ React合成事件是原生事件的跨浏览器包装器
 
 ###### 事件触发
  - DOM触发事件, dispatchEvent执行
- - 根据触发的真实DOM找到对应的Fiber节点和函数进行触发
+ - 根据触发的真实DOM找到对应的Fiber节点和函数进行触发,并且会进行冒泡
+ - 冒泡是通过event.target的parentNode找到上级的DOM节点,再触发它的事件,不断的冒泡
 
 
 ###### 注意点
@@ -547,7 +577,14 @@ React合成事件是原生事件的跨浏览器包装器
 
 - 合成事件接收函数后进行调用,使用的是默认绑定规则,即指向全局对象,因此需要使用bind或者箭头函数
 ```jsx
-// onClick={this.click} 
+// 1. 箭头函数定义方法
+// click: ()=>{} 
+// 2. 调用时使用箭头函数
+// onClick={()=>{ fn() }}
+// 3. 构造函数中绑定this
+// constructor(){
+//   this.click = this.click.bind(this);
+// }
 // 由上述代码可见，this.click并没有加(),所以只是将这个方法的引用给了onClick，并没有马上调用,下次onClick调用时使用的是默认绑定规则,即this指向全局对象
 
 // 实例代码
@@ -562,13 +599,55 @@ React合成事件是原生事件的跨浏览器包装器
 - 合成事件都绑定在根节点,避免绑定原生事件,在事件触发时通过合成事件的机制进行分发,内存消耗更小,并且通过对象池管理合成对象的创建和销毁,提高性能
 - 合成事件中会进行批量优化, setState在合成函数中是异步,多次设置仅执行一次
 
+##### 16. Redux相关概念
+
+##### 17. React 18 了解
+
+###### batch update - 批量更新
+在18版本前,react在 - batch update: 批量更新state,即便在异步中,同样会将多次setState合并成一次, flushSync(()=>{ 不需要批处理的代码 })
+```
+
+```
+ - startTransition: 渲染可中断并且可以设置优先级, const [ isPedding, startTransiton ] = useTransition();
+ - 严格模式会对组件进行两次渲染, 17版本时做了限制,取消了一次渲染的日志
+
+###### Concurrent Renderer
+并发渲染模式: 帮助应用保持响应，并根据用户的设备性能和网速进行适当的调整，该模式通过使渲染可中断来修复阻塞渲染限制
+ ```jsx
+ ReactDOM.createRoot(root).render(<App />);
+ ```
+
+###### 渲染任务
+一般将状态更新的分为两类:
+ - 紧急更新任务: 比如一些用户交互行为，按键，点击，输入等
+ - 过渡更新任务: 比如 UI 从一个视图过渡到另外一个视图
+
+```jsx
+// 传入的回调函数中的更新任务将会被作为过渡更新任务处理, 优先级较低
+const [value, setValue] = useState('');
+startTransition(()=>{
+   /* 更新任务 */
+   setValue('')
+});
+
+
+// 新增hook
+const [ isPending , startTransition ] = React.useTransition()
+```
+
+###### 19. React流程
+React
+
 
 ###### 18. diff算法和key的作用
 
-##### 15.  Redux相关概念
 
-##### React流程
-React
+###### 20. 严格模式
+ - 严格模式会进行2次渲染, 17版本会限制控制台(console),使其2次渲染只打印一次, 但是像alert就不受限制
+ - 用途: 
+  - 识别不安全的生命周期
+  - 使用废弃的API或方法时警告
+  - 检测不安全的副作用
 
 ##### API
 
