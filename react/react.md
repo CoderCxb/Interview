@@ -605,16 +605,16 @@ React合成事件是原生事件的跨浏览器包装器
 
 ###### batch update - 批量更新
 在18版本前,react在 - batch update: 批量更新state,即便在异步中,同样会将多次setState合并成一次, flushSync(()=>{ 不需要批处理的代码 })
-```
 
-```
  - startTransition: 渲染可中断并且可以设置优先级, const [ isPedding, startTransiton ] = useTransition();
  - 严格模式会对组件进行两次渲染, 17版本时做了限制,取消了一次渲染的日志
 
 ###### Concurrent Renderer
 并发渲染模式: 帮助应用保持响应，并根据用户的设备性能和网速进行适当的调整，该模式通过使渲染可中断来修复阻塞渲染限制
  ```jsx
- ReactDOM.createRoot(root).render(<App />);
+import ReactDOM from 'react-dom/client';
+// render依旧在'react-dom'
+ReactDOM.createRoot(root).render(<App />);
  ```
 
 ###### 渲染任务

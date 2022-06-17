@@ -26,7 +26,7 @@ PS: 还有IFC,IFC内部元素是水平排版
   - 垂直方向上的margin会发生重叠
   - 子元素不会影响外部元素
   - BFC的区域不会与float元素重叠
-  - 计算BFC的高度时,浮动元·素也会参与计算
+  - 计算BFC的高度时,浮动元素也会参与计算
 ·
 常见触发条件: 
   - float不为none
@@ -134,6 +134,8 @@ flex可以看成是一维的,而Grid是二维的
   - grid-row-gap: 行之间的间距
   - grid-column-gap 列之间的间距
   - grid-gap: grid-row-gap和grid-column-gap的简写
+  - align-items: 进行垂直居中
+  - 
 
 ###### 需要掌握
  - 如何居中: 和flex布局一样, 水平 just-content:center; 垂直: align-items: center
@@ -271,6 +273,7 @@ text-overflow: ellipsis;
 white-space: nowrap;
 overflow: hidden;
 ```
+
 #### 多行文本超过...
 ```css
 
@@ -294,7 +297,7 @@ CSS选择器: id选择器(#id)、类选择器(.class)、标签选择器(div)、�
 #### 选择器的权重
 权重优先级: !important(∞) > 行内样式(1000) > id (100) > class、伪类、属性选择器(10) > 标签、伪元素(1) > * 、继承、子类选择器、兄弟选择器(0)
 
-相同权重时: 行内样式 > 内联style > 外联style
+相同权重时: 内联style > 外联style
 
 注意: 权重没有进制, 即权重优先级低的无法通过叠加覆盖权重高的
 

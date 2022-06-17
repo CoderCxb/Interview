@@ -15,7 +15,7 @@
 - ts-loader ：加载编译ts文件
 - vue-loader :  加载编译vue文件
 - babel-loader: 语法编译
-- cache-loader : 在性能开销大的loader前使用(因此loader是从后往前执行)，目的是将结果缓存进磁盘
+- cache-loader : 在性能开销大的loader前使用(因为loader是从后往前执行)，目的是将结果缓存进磁盘
 
 ###### loader使用方式
 - 内联方式(了解即可): 在import时也可以指定 import"style-loader!css-loader!../css/index.css"
@@ -38,7 +38,7 @@ module.exports = {
 #### 2. Webpack常见Plugin
 - html-webpack-plugin: 简化html创建过程,自动创建文件并将打包后的js导入html文件
 - copy-webpack-plugin: 拷贝文件/文件夹到构建目录下
-- SplitChunksPlugin: 
+- SplitChunksPlugin: 进行模块分离
 - mini-css-extract-plugin：提取chunk的css代码到独立文件
 - CssMinimizerWebpackPlugin: 对css进行压缩
 - terser-webpack-plugin : 对JS代码进行压缩混淆
