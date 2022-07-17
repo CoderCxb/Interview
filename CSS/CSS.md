@@ -264,8 +264,8 @@ align-items: center;
 #### 单位 px、em、rem
 px: 一个像素点
 em: 元素的font-size大小
-rem: 跟元素的font-size大小
-vw、vh: 视口
+rem:  (root)根元素的font-size大小
+vw、vh: 视口宽高
 
 #### 文本超出...
 ```css

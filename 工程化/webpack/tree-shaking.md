@@ -7,12 +7,12 @@ Webpack5尝试的时候是默认保留了css,如果css被tree-shaking, 可以配
 ## JS的tree-shaking
 
 ### usedExports + Terser
-通过标记某些函数是否被使用, 之后通过Terser来进行优化(删除的并不彻底,优化力度没有sideEffects大)
+告知 webpack 去决定每个模块使用的导出内容(设置为false会被优化), 之后通过Terser来进行优化(删除的并不彻底,优化力度没有sideEffects大)
 
 ```js
 module.exports = {
   optimization: {
-    // 会标注哪些函数没有被使用, 之后会被Terser解析并优化
+    // 会标注哪些变量没有被使用, 之后会被Terser解析并优化
     usedExports: true,
     minimize: true, // 设置为true, 不然不会调用Terser
     // 默认的minimizer就有Terser
